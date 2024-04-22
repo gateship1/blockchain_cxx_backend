@@ -1,3 +1,4 @@
 [submodule "cmake"]
 	path = cmake
-	url = git@github.com:gateship1/cmake_helpers.git
+	url = https://github.com/gateship1/cmake_helpers.git
+	tag = 43077e1b0319204159488e901542e1c92b702220
