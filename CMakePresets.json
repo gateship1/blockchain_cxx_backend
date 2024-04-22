@@ -1,0 +1,163 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "displayName": "Base",
+            "description": "Sets build and install directories",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "SERVER": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                },
+                "UNITTEST": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                },
+                "ENABLE_LONG_TESTS": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                },
+                "SIMULATE": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                }
+            }
+        },
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "displayName": "Linux Base",
+            "description": "Sets host system - Linux",
+            "inherits": [ "base" ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "x86_64-linux-gcc-base",
+            "displayName": "Linux base configuration for x86_64 Architecture with gcc",
+            "description": "Sets compiler, generator, and architecture",
+            "hidden": true,
+            "inherits": [ "linux-base" ],
+            "generator": "Unix Makefiles",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_CXX_FLAGS": "-g -Wall"
+            }
+        },
+        {
+            "name": "blockchain-server",
+            "displayName": "Blockchain `server` build",
+            "description": "Allows the blockchain backend to run in `server mode` (to connect with frontend)",
+            "inherits": [ "x86_64-linux-gcc-base" ],
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "SERVER": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }
+            }
+        },
+        {
+            "name": "terminal-simulator",
+            "displayName": "Debug Linux x86_64 gcc Terminal Simulator build.",
+            "description": "Allows the blockchain backend to run in the terminal (in simulation mode)",
+            "inherits": [ "x86_64-linux-gcc-base" ],
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "SIMULATE": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }
+            }
+        },
+        {
+            "name": "debug-with-tests",
+            "displayName": "Debug Linux x86_64 gcc build with unit testing.",
+            "description": "Build unit tests for blockchain engine.",
+            "inherits": [ "x86_64-linux-gcc-base" ],
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "UNITTEST": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }
+            }
+        },
+        {
+            "name": "debug-with-extra-testing",
+            "displayName": "Debug Linux x86_64 gcc build with extra unit testing.",
+            "description": "Build unit tests for blockchain engine (including long tests).",
+            "inherits": [ "debug-with-tests" ],
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS_DEBUG": "-O0",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "ENABLE_LONG_TESTS": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }              
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "blockchain-server",
+            "displayName": "Blockchain `server` build",
+            "configurePreset": "blockchain-server",
+            "verbose": false,
+            "cleanFirst": false
+        },
+        {
+            "name": "terminal-simulator",
+            "displayName": "Debug Linux x86_64 gcc Terminal Simulator build",
+            "configurePreset": "terminal-simulator",
+            "verbose": true,
+            "cleanFirst": false
+        },
+        {
+            "name": "debug-with-tests",
+            "displayName": "Debug Linux x86_64 gcc build with unit testing",
+            "configurePreset": "debug-with-tests",
+            "verbose": true,
+            "cleanFirst": false
+        },
+        {
+            "name": "debug-with-extra-testing",
+            "displayName": "Debug Linux x86_64 gcc build with extra unit testing",
+            "configurePreset": "debug-with-extra-testing",
+            "verbose": true,
+            "cleanFirst": false
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "unit-test",
+            "displayName": "Unit test with Doctest",
+            "configurePreset": "debug-with-tests"
+        },
+        {
+            "name": "extra-unit-test",
+            "displayName": "Extra unit test with Doctest",
+            "configurePreset": "debug-with-extra-testing"
+        }
+    ]
+}
